@@ -1,0 +1,7 @@
+services:
+  plugin.manager.content_model_monkey_field:
+    class: Drupal\content_model_monkey\ContentModelMonkeyFieldPluginManager
+    parent: default_plugin_manager
+  content_model_monkey.content_model_monkey_manager:
+    class: Drupal\content_model_monkey\ContentModelMonkeyManager
+    arguments: ['@plugin.manager.content_model_monkey_field']

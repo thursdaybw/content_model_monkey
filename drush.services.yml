@@ -1,0 +1,6 @@
+services:
+  content_model_monkey.commands:
+    class: \Drupal\content_model_monkey\Commands\ContentModelMonkeyCommands
+    arguments: ['@content_model_monkey.content_model_monkey_manager']
+    tags:
+      - { name: drush.command }
