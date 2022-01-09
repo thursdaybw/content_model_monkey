@@ -15,6 +15,22 @@ use Drupal\content_model_monkey\ContentModelMonkeyFieldPluginBase;
  */
 class Boolean extends ContentModelMonkeyFieldPluginBase {
 
+  protected $defaultViewModeFieldFormatterSettings = [
+    'label' => 'inline',
+    'type' => 'boolean',
+    'settings' => [
+      'link_to_entity' => FALSE,
+    ],
+  ];
+
+  protected $searchIndexViewModeFieldFormatterSettings = [
+    'label_position' => 'hidden',
+    'field_type' => 'datetime_default',
+    'settings' => [
+      'link_to_entity' => FALSE,
+    ],
+  ];
+
   protected $fullViewModeType = 'boolean';
   protected $searchIndexViewModeType = 'boolean';
 

@@ -15,19 +15,23 @@ use Drupal\content_model_monkey\ContentModelMonkeyFieldPluginBase;
  */
 class DateTime extends ContentModelMonkeyFieldPluginBase {
 
-  protected $fullViewModeType = 'datetime_default';
-  // @todo add view mode settings to content model for each field type.
-  protected $fullViewModeSettings = [
-    'timezone_override' => '',
-    'format_type' => 'h_medium_am_pm_zone',
+  protected $defaultViewModeFieldFormatterSettings = [
+    'label' => 'inline',
+    'type' => 'datetime_default',
+    'settings' => [
+      'timezone_override' => '',
+      'format_type' => 'h_medium_am_pm_zone',
+    ],
   ];
 
-  protected $searchIndexViewModeType = 'datetime_default';
-  protected $searchIndexViewModeSettings = [
-    'timezone_override' => '',
-    'format_type' => 'h_medium_am_pm_zone',
+  protected $searchIndexViewModeFieldFormatterSettings = [
+    'label' => 'hidden',
+    'type' => 'datetime_default',
+    'settings' => [
+      'timezone_override' => '',
+      'format_type' => 'h_medium_am_pm_zone',
+    ],
   ];
-
 
   public function getFieldType() {
     return 'datetime';

@@ -15,12 +15,19 @@ use Drupal\content_model_monkey\ContentModelMonkeyFieldPluginBase;
  */
 class TextLong extends ContentModelMonkeyFieldPluginBase {
 
-  protected $fullViewModeLabelPosition = 'above';
-  protected $fullViewModeType = 'basic_string';
-  protected $fullViewModeSettings = [];
+  protected $defaultViewModeFieldFormatterSettings = [
+    'label' => 'above',
+    'type' => 'basic_string',
+    'settings' => [
+      'link_to_entity' => FALSE,
+    ],
+  ];
 
-  protected $searchIndexViewModeType = 'basic_string';
-  protected $searchIndexViewModeSettings = [];
+  protected $searchIndexViewModeFieldFormatterSettings = [
+    'label' => 'hidden',
+    'type' => 'basic_string',
+    'settings' => [],
+  ];
 
   public function getFieldType() {
     return 'string_long';

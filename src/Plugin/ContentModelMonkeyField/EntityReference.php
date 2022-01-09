@@ -16,14 +16,20 @@ use Drupal\content_model_monkey\StringUtils;
  */
 class EntityReference extends ContentModelMonkeyFieldPluginBase {
 
-  protected $fullViewModeType = 'entity_reference_label';
-  protected $fullViewModeSettings = [
-    'link' => TRUE
+  protected $defaultViewModeFieldFormatterSettings = [
+    'label' => 'inline',
+    'type' => 'entity_reference_label',
+    'settings' => [
+      'link' => TRUE,
+    ],
   ];
 
-  protected $searchIndexViewModeType = 'entity_reference_label';
-  protected $searchIndexViewModeSettings = [
-    'link' => FALSE,
+  protected $searchIndexViewModeFieldFormatterSettings = [
+    'label' => 'hidden',
+    'type' => 'entity_reference_label',
+    'settings' => [
+      'link' => FALSE,
+    ],
   ];
 
   public function getFieldType() {
@@ -39,24 +45,43 @@ class EntityReference extends ContentModelMonkeyFieldPluginBase {
 
   public function getFieldConfigSettings() {
 
-    $string_utils = new StringUtils();
-    $definition = $string_utils->trimPrefixFromString('ref@', $this->configuration['cmField']['type']);
-    $parts = explode('/', $definition);
-    $entity_type = $parts[0];
-    $bundle      = $parts[1];
+    $cm_config = $this->getFieldSettingsFromContentModel();
 
-    return [
-      'handler' => "default:$entity_type",
+    $settings = [
+      'handler' => "default:{$cm_config['entity_type']}",
       'handler_settings' => [
         'target_bundles' => [
-          $bundle => $bundle,
+          $cm_config['bundle'] => $cm_config['bundle'],
         ],
         'sort' => [
           'field' => '_none',
-          'direction' => 'ASC',
         ],
         'auto_create' => FALSE,
       ],
+    ];
+
+    if ($cm_config['entity_type'] === 'media') {
+      $settings['auto_create_bundle'] = $cm_config['bundle'];
+    }
+
+    return $settings;
+  }
+
+
+  public function getFieldStorageSettings() {
+    $cm_config = $this->getFieldSettingsFromContentModel();
+    return [
+      'target_type' => $cm_config['entity_type'],
+    ];
+  }
+
+  private function getFieldSettingsFromContentModel() {
+    $string_utils = new StringUtils();
+    $definition = $string_utils->trimPrefixFromString('ref@', $this->configuration['cmField']['type']);
+    $parts = explode('/', $definition);
+    return  [
+      'entity_type' => $parts[0],
+      'bundle'      => $parts[1],
     ];
   }
 

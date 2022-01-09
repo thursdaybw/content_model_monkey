@@ -15,24 +15,28 @@ use Drupal\content_model_monkey\ContentModelMonkeyFieldPluginBase;
  */
 class Link extends ContentModelMonkeyFieldPluginBase {
 
-  protected $fullViewModeType = 'link';
-
-  protected $fullViewModeSettings = [
-    'trim_length' => NULL,
-    'url_only'    => FALSE,
-    'url_plain'   => FALSE,
-    'rel'         => 0,
-    'target'      => 0,
+  protected $defaultViewModeFieldFormatterSettings = [
+    'label' => 'inline',
+    'type' => 'link',
+    'settings' => [
+      'trim_length' => NULL,
+      'url_only'    => FALSE,
+      'url_plain'   => FALSE,
+      'rel'         => 0,
+      'target'      => 0,
+    ],
   ];
 
-  protected $searchIndexViewModeType = 'link_separate';
-
-  protected $searchIndexViewModeSettings = [
-    'trim_length' => NULL,
-    'url_only'    => FALSE,
-    'url_plain'   => FALSE,
-    'rel'         => 0,
-    'target'      => 0,
+  protected $searchIndexViewModeFieldFormatterSettings = [
+    'label' => 'hidden',
+    'type' => 'link_separate',
+    'settings' => [
+      'trim_length' => NULL,
+      'url_only'    => FALSE,
+      'url_plain'   => FALSE,
+      'rel'         => 0,
+      'target'      => 0,
+    ],
   ];
 
   public function getFieldType() {

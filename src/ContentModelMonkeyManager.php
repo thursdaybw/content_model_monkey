@@ -182,18 +182,18 @@ class ContentModelMonkeyManager implements ContainerInjectionInterface {
       $plugin_id = $field['type'];
     }
 
-    $instance = $this->fieldPluginManager->createInstance($plugin_id, ['cmField' => $field]);
+    $cmm_field_plugin_instance = $this->fieldPluginManager->createInstance($plugin_id, ['cmField' => $field]);
 
     if (!$field_storage) {
       echo "Creating field storage for {$field['field_name']}\n";
       $field_storage = FieldStorageConfig::create([
         'field_name'  => $field['field_name'],
         'entity_type' => 'node',
-        'type'        => $instance->getFieldType(),
+        'type'        => $cmm_field_plugin_instance->getFieldType(),
       ]);
 
     }
-    $field_storage->set('settings', $instance->getFieldStorageSettings());
+    $field_storage->set('settings', $cmm_field_plugin_instance->getFieldStorageSettings());
     $field_storage->save();
 
     $field_config = FieldConfig::loadByName('node', $type_name, $field['field_name']);
@@ -202,21 +202,41 @@ class ContentModelMonkeyManager implements ContainerInjectionInterface {
       $field_config = FieldConfig::create([
         'field_storage' => $field_storage,
         'bundle'        => $type_name,
-        'required'      => $field['required'],
-        'label'         => $field['label'],
       ]);
     }
-    $field_config->setSettings($instance->getFieldConfigSettings());
+    $field_config->setLabel($field['label']);
+    $field_config->setRequired($field['required']);
+
+    $field_config_settings = $cmm_field_plugin_instance->getFieldConfigSettings();
+    $field_config->setSettings($field_config_settings);
     $field_config->save();
 
-    echo "Add {$field['field_name']} to full view mode on $type_name\n";
-    $instance->addToDisplayViewMode($type_name, $field, 'full');
-
-    echo "Add {$field['field_name']} to search view mode on $type_name\n";
-    $instance->addToDisplayViewMode($type_name, $field, 'search_index');
-
+    // @todo, this needs be another plugin or such.
     echo "Add {$field['field_name']} to form view mode on $type_name\n";
-    $instance->addToFormViewMode($type_name, $field);
+    $cmm_field_plugin_instance->addToFormViewMode($type_name, $field);
+
+    echo "Add {$field['field_name']} to full view mode on $type_name\n";
+    $cmm_field_plugin_instance->addToDisplayViewMode($type_name, $field, 'full', 1);
+
+    if ($field['field_name'] === 'field_published_date') {
+
+      echo "Add {$field['field_name']} to search view mode on $type_name\n";
+      $cmm_field_plugin_instance->addToDisplayViewMode($type_name, $field, 'search', 0, 'date');
+
+      echo "Published date: Add {$field['field_name']} to summary display mode on $type_name\n";
+      $cmm_field_plugin_instance->addToDisplayViewMode($type_name, $field, 'summary', 0, 'date');
+
+      echo "Published date: Add {$field['field_name']} to teaser display mode on $type_name\n";
+      $cmm_field_plugin_instance->addToDisplayViewMode($type_name, $field, 'teaser', 0, 'date');
+
+      echo "Published date: Add {$field['field_name']} to teaser - inline display mode on $type_name\n";
+      $cmm_field_plugin_instance->addToDisplayViewMode($type_name, $field, 'teaser_inline', 0, 'date');
+
+    }
+    else {
+      echo "Add {$field['field_name']} to search index view mode on $type_name\n";
+      $cmm_field_plugin_instance->addToDisplayViewMode($type_name, $field, 'search_index', 0);
+    }
 
   }
 
@@ -290,14 +310,35 @@ class ContentModelMonkeyManager implements ContainerInjectionInterface {
    *   The field data as read from the row in the fields sheet.
    */
   private function getCmFieldDataFromRowNumber(int $row_number): array {
-    $field['field_name']  = (string) $this->fieldsSheet->getCell("C{$row_number}")->getValue();
-    $field['label']       = (string) $this->fieldsSheet->getCell("D{$row_number}")->getValue();
-    $field['description'] = (string) $this->fieldsSheet->getCell("E{$row_number}")->getValue();
-    $field['type']        = (string) $this->fieldsSheet->getCell("H{$row_number}")->getValue();
-    $field['required']    = (boolean) $this->fieldsSheet->getCell("F{$row_number}")->getCalculatedValue();
-    $field['cardinality'] = (int) $this->fieldsSheet->getCell("G{$row_number}")->getValue();
-    $field['weight']      = $row_number;
+
+    $cm_area = (string) $this->fieldsSheet->getCell("A{$row_number}")->getValue();
+
+
+    $field['field_name']           = (string) $this->fieldsSheet->getCell("C{$row_number}")->getValue();
+    $field['label']                = (string) $this->fieldsSheet->getCell("D{$row_number}")->getValue();
+    $field['description']          = (string) $this->fieldsSheet->getCell("E{$row_number}")->getValue();
+    $field['type']                 = (string) $this->fieldsSheet->getCell("H{$row_number}")->getValue();
+    $field['form_view_mode_group'] = $this->convertAreaToGroupName($cm_area);
+    $field['required']             = (boolean) $this->fieldsSheet->getCell("F{$row_number}")->getCalculatedValue();
+    $field['cardinality']          = (int) $this->fieldsSheet->getCell("G{$row_number}")->getValue();
+    $field['weight']               = $row_number;
     return $field;
+  }
+
+  private function convertAreaToGroupName($value) {
+    if ($value === 'Meta') {
+      return 'meta';
+    }
+
+    if ($value === 'Content') {
+      return 'content';
+    }
+
+    if ($value === 'Downloadable files') {
+      return 'attach';
+    }
+
+    return 'content';
   }
 
 }

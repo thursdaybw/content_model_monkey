@@ -15,12 +15,17 @@ use Drupal\content_model_monkey\ContentModelMonkeyFieldPluginBase;
  */
 class Html extends ContentModelMonkeyFieldPluginBase {
 
-  protected $fullViewModeLabelPosition = 'above';
-  protected $fullViewModeType = 'text_default';
-  protected $fullViewModeSettings = [];
+  protected $defaultViewModeFieldFormatterSettings = [
+    'label' => 'above',
+    'type' => 'text_default',
+    'settings' => [],
+  ];
 
-  protected $searchIndexViewModeType = 'text_default';
-  protected $searchIndexViewModeSettings = [];
+  protected $searchIndexViewModeFieldFormatterSettings = [
+    'label' => 'hidden',
+    'type' => 'text_default',
+    'settings' => [],
+  ];
 
   public function getFieldType() {
     return 'text_long';
