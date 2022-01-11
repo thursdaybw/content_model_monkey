@@ -21,6 +21,12 @@ class Html extends ContentModelMonkeyFieldPluginBase {
     'settings' => [],
   ];
 
+  protected $secondaryViewModeFieldFormatterSettings = [
+    'label' => 'inline',
+    'type' => 'text_default',
+    'settings' => [],
+  ];
+
   protected $searchIndexViewModeFieldFormatterSettings = [
     'label' => 'hidden',
     'type' => 'text_default',

@@ -33,6 +33,15 @@ class DateTime extends ContentModelMonkeyFieldPluginBase {
     ],
   ];
 
+  protected $secondaryViewModeFieldFormatterSettings = [
+    'label' => 'hidden',
+    'type' => 'datetime_default',
+    'settings' => [
+      'timezone_override' => '',
+      'format_type' => 'h_medium_am_pm_zone',
+    ],
+  ];
+
   public function getFieldType() {
     return 'datetime';
   }

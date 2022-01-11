@@ -24,6 +24,14 @@ class EntityReference extends ContentModelMonkeyFieldPluginBase {
     ],
   ];
 
+  protected $secondaryViewModeFieldFormatterSettings = [
+    'label' => 'hidden',
+    'type' => 'entity_reference_label',
+    'settings' => [
+      'link' => TRUE,
+    ],
+  ];
+
   protected $searchIndexViewModeFieldFormatterSettings = [
     'label' => 'hidden',
     'type' => 'entity_reference_label',
@@ -61,7 +69,7 @@ class EntityReference extends ContentModelMonkeyFieldPluginBase {
     ];
 
     if ($cm_config['entity_type'] === 'media') {
-      $settings['auto_create_bundle'] = $cm_config['bundle'];
+      $settings['handler_settings']['auto_create_bundle'] = $cm_config['bundle'];
     }
 
     return $settings;

@@ -24,6 +24,15 @@ class Date extends ContentModelMonkeyFieldPluginBase {
     ],
   ];
 
+  protected $secondaryViewModeFieldFormatterSettings = [
+    'label' => 'hidden',
+    'type' => 'datetime_default',
+    'settings' => [
+      'timezone_override' => '',
+      'format_type' => 'h_day_month_year',
+    ],
+  ];
+
   protected $searchIndexViewModeFieldFormatterSettings = [
     'label' => 'hidden',
     'type' => 'datetime_default',

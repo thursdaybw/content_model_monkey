@@ -11,16 +11,24 @@ use Drupal\layout_builder\SectionComponent;
 abstract class ContentModelMonkeyFieldPluginBase extends PluginBase implements ContentModelMonkeyFieldInterface {
 
   protected $defaultViewModeFieldFormatterSettings = [
-    'label_position' => 'inline',
-    'field_type' => 'string',
+    'label' => 'inline',
+    'type' => 'string',
     'settings' => [
       'link_to_entity' => FALSE,
     ],
   ];
 
   protected $searchIndexViewModeFieldFormatterSettings = [
-    'label_position' => 'hidden',
-    'field_type' => 'string',
+    'label' => 'hidden',
+    'type' => 'string',
+    'settings' => [
+      'link_to_entity' => FALSE,
+    ],
+  ];
+
+  protected $secondaryViewModeFieldFormatterSettings = [
+    'label' => 'hidden',
+    'type' => 'string',
     'settings' => [
       'link_to_entity' => FALSE,
     ],
@@ -37,15 +45,17 @@ abstract class ContentModelMonkeyFieldPluginBase extends PluginBase implements C
   public function addToFormViewMode($type_name, $field) {
 
     $form_view_mode = \Drupal::service('entity_type.manager')->getStorage('entity_form_display')->load("node.{$type_name}.default");
-    $field_group_settings = $form_view_mode->getThirdPartySettings('field_group')['group_' . $field['form_view_mode_group']];
-    if (is_null($field_group_settings)) {
-      $field_group_settings = ['children' => []];
-    }
-    if (!in_array($field['field_name'], $field_group_settings['children'])) {
-      $field_group_settings['children'][] = $field['field_name'];
+    if (!empty($field['form_view_mode_group'])) {
+      $field_group_settings = $form_view_mode->getThirdPartySettings('field_group')['group_' . $field['form_view_mode_group']];
+      if (is_null($field_group_settings)) {
+        $field_group_settings = ['children' => []];
+      }
+      if (!in_array($field['field_name'], $field_group_settings['children'])) {
+        $field_group_settings['children'][] = $field['field_name'];
+      }
+      $form_view_mode->setThirdPartySetting('field_group', 'group_' . $field['form_view_mode_group'], $field_group_settings);
     }
 
-    $form_view_mode->setThirdPartySetting('field_group', 'group_' . $field['form_view_mode_group'], $field_group_settings);
 
     $options = $this->getFieldWidgetOptions();
     $options['weight'] = $field['weight'];
@@ -77,19 +87,24 @@ abstract class ContentModelMonkeyFieldPluginBase extends PluginBase implements C
     // These all use the default formatter config for the field.
     // exceptions like search index, have to supply an override property.
     // see below for how the prefix is added toa porperty of the plugin.
-    $rendered_view_modes = [
+    $default_view_modes = [
       'full',
+    ];
+    $secondary_view_modes = [
       'search',
       'summary',
       'teaser',
       'teaser_inline',
     ];
-    if (!in_array($view_mode_short_name, $rendered_view_modes)) {
+    if (!in_array($view_mode_short_name, $default_view_modes) && !in_array($view_mode_short_name, $secondary_view_modes)) {
       $prefix = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $view_mode_short_name)))) . 'ViewModeFieldFormatterSettings';
       $config = $this->$prefix;
     }
-    else {
+    else if (in_array($view_mode_short_name, $default_view_modes)) {
       $config = $this->defaultViewModeFieldFormatterSettings;
+    }
+    else if (in_array($view_mode_short_name, $secondary_view_modes)) {
+      $config = $this->secondaryViewModeFieldFormatterSettings;
     }
 
     return $config;
@@ -121,7 +136,14 @@ abstract class ContentModelMonkeyFieldPluginBase extends PluginBase implements C
     foreach ($components as $component) {
       if ($component->get('configuration')['id'] === "field_block:node:$bundle_name:{$field['field_name']}") {
         $component->setConfiguration($config);
-        $component->setWeight($field['weight']);
+
+        if ($field['required']) {
+          $component->setWeight(1);
+        }
+        else {
+          $component->setWeight($field['weight']);
+        }
+
         $component->setRegion($region_name);
         $new_component = FALSE;
         break;

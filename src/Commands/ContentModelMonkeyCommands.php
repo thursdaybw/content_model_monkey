@@ -64,7 +64,7 @@ class ContentModelMonkeyCommands extends DrushCommands {
    * to clone the base type and provide the new type with a new name,
    * description etc.
    *
-   * @param string $type_name
+   * @param string $type_names
    *   The machine name of the content type to create.
    *
    * @usage cmm:create_type type_name
@@ -73,8 +73,11 @@ class ContentModelMonkeyCommands extends DrushCommands {
    * @command cmm:create_type
    * @aliases cmct
    */
-  public function cmCreateType(string $type_name) {
-    $this->contentModelMonkeyManager->createType($type_name);
+  public function cmCreateType(string $type_names) {
+    $type_names = explode(',', $type_names);
+    foreach ($type_names as $type_name) {
+      $this->contentModelMonkeyManager->createType($type_name);
+    }
     $this->logger()->success(dt('Achievement unlocked.'));
   }
 
@@ -85,7 +88,7 @@ class ContentModelMonkeyCommands extends DrushCommands {
    * to clone the base type and provide the new type with a new name,
    * description etc.
    *
-   * @param string $type_name
+   * @param string $type_names
    *   The machine name of the content type to create.
    *
    * @usage cmm:create_type type_name
@@ -94,9 +97,16 @@ class ContentModelMonkeyCommands extends DrushCommands {
    * @command cmm:create_type_with_fields
    * @aliases cmctwf
    */
-  public function cmCreateTypeWithFields(string $type_name) {
-    $this->contentModelMonkeyManager->createType($type_name);
-    $this->contentModelMonkeyManager->createFieldsForType($type_name);
+  public function cmCreateTypeWithFields(string $type_names) {
+    $type_names = explode(',', $type_names);
+    foreach ($type_names as $type_name) {
+      echo "Creating type: $type_name\n";
+      $this->contentModelMonkeyManager->createType($type_name);
+
+      echo "Creating fields for $type_name\n";
+      echo "===============================\n\n";
+      $this->contentModelMonkeyManager->createFieldsForType($type_name);
+    }
     $this->logger()->success(dt('Achievement unlocked.'));
   }
 
@@ -107,20 +117,24 @@ class ContentModelMonkeyCommands extends DrushCommands {
    * to clone the base type and provide the new type with a new name,
    * description etc.
    *
-   * @param string $type_name
+   * @param string $type_names
    *   The machine name of the content type to create.
    *
    * @usage cmm:create_type type_name
    *   Usage description
    *
-   * @command cmm:delete_type
+   * @command cmm:delete_types
    * @aliases cmdt
    */
-  public function cmDeleteType(string $type_name) {
+  public function cmDeleteTypes(string $type_names) {
     $entity_type_manager = \Drupal::entityTypeManager();
-    $content_type_entity = $entity_type_manager->getStorage('node_type')->load($type_name);
-    if (!is_null($content_type_entity)) {
-      $content_type_entity->delete();
+
+    $type_names = explode(',', $type_names);
+    foreach ($type_names as $type_name) {
+      $content_type_entity = $entity_type_manager->getStorage('node_type')->load($type_name);
+      if (!is_null($content_type_entity)) {
+        $content_type_entity->delete();
+      }
     }
 
     $this->logger()->success(dt('Achievement unlocked.'));

@@ -23,6 +23,14 @@ class TextLong extends ContentModelMonkeyFieldPluginBase {
     ],
   ];
 
+  protected $secondaryViewModeFieldFormatterSettings = [
+    'label' => 'hidden',
+    'type' => 'basic_string',
+    'settings' => [
+      'link_to_entity' => FALSE,
+    ],
+  ];
+
   protected $searchIndexViewModeFieldFormatterSettings = [
     'label' => 'hidden',
     'type' => 'basic_string',

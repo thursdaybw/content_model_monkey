@@ -23,6 +23,14 @@ class Boolean extends ContentModelMonkeyFieldPluginBase {
     ],
   ];
 
+  protected $secondaryViewModeFieldFormatterSettings = [
+    'label' => 'hidden',
+    'type' => 'boolean',
+    'settings' => [
+      'link_to_entity' => FALSE,
+    ],
+  ];
+
   protected $searchIndexViewModeFieldFormatterSettings = [
     'label_position' => 'hidden',
     'field_type' => 'datetime_default',

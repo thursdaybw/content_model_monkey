@@ -39,6 +39,18 @@ class Link extends ContentModelMonkeyFieldPluginBase {
     ],
   ];
 
+  protected $secondaryViewModeFieldFormatterSettings = [
+    'label' => 'hidden',
+    'type' => 'link',
+    'settings' => [
+      'trim_length' => NULL,
+      'url_only'    => FALSE,
+      'url_plain'   => FALSE,
+      'rel'         => 0,
+      'target'      => 0,
+    ],
+  ];
+
   public function getFieldType() {
     return 'link';
   }
